@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>SSAI Scanning Collection</title>
+<style>
+  :root { --bg:#020B1F; --card:#08172E; --border:#1C5274; --neon:#39E8FF; --text:#F4FAFF; --muted:#5E7D9A; --sub:#9FB5D1; --good:#4DFFB8; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--text); font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:20px 14px 60px; }
+  .wrap { max-width:640px; margin:0 auto; }
+  .hero { text-align:center; background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px 18px; box-shadow:0 0 24px rgba(57,232,255,.14); }
+  .avatar { width:64px; height:64px; border-radius:50%; background:rgba(57,232,255,.15); border:1px solid var(--neon); color:var(--neon); font-size:28px; font-weight:800; line-height:64px; margin:0 auto 10px; }
+  h1 { font-size:22px; }
+  .since { color:var(--muted); font-size:12px; margin-top:4px; }
+  .stats { display:flex; justify-content:center; gap:36px; margin-top:16px; }
+  .stat b { display:block; font-size:20px; }
+  .stat span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.6px; }
+  .list { margin-top:18px; display:flex; flex-direction:column; gap:8px; }
+  .row { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid rgba(28,82,116,.6); border-radius:13px; padding:9px 12px; }
+  .thumb { width:42px; height:58px; object-fit:contain; border-radius:5px; background:#0C2242; flex:none; }
+  .ph { display:block; }
+  .info { flex:1; min-width:0; }
+  .cardname { font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .qty { color:var(--sub); font-weight:600; font-size:12px; }
+  .meta { color:var(--muted); font-size:12px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .value { color:var(--good); font-weight:700; font-size:13px; }
+  .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:26px; }
+  .foot b { color:var(--neon); }
+  .empty { color:var(--sub); text-align:center; padding:42px 18px; }
+</style>
+</head>
+<body><div class="wrap" id="app"><div class="empty">Loading collection...</div></div>
+<script>
+const app = document.getElementById('app');
+// Absolute Supabase functions base so this page works hosted on ANY origin
+// (Cloudflare Pages at share.ssaiscanning.com, github.io, etc.) — not just when
+// served from the Supabase origin. The collection-page function must send CORS.
+const API_BASE = 'https://vdydjmxsuluokbrxyqlu.supabase.co/functions/v1';
+const params = new URLSearchParams(location.search);
+// Code is the LAST path segment (…/collection/<name-slug>/<code>); ?code= is a
+// backward-compatible fallback. The name slug before it is decorative.
+const segs = location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+const lastSeg = segs.length ? segs[segs.length - 1] : '';
+const code = params.get('code') || (/^[A-Za-z0-9]{6,24}$/.test(lastSeg) ? lastSeg : '');
+const money = (n) => n == null ? '' : '$' + Number(n).toFixed(2);
+const int = (n) => Number(n || 0).toLocaleString('en-US');
+const date = (raw, opts) => raw ? new Date(raw).toLocaleDateString('en-US', opts) : '';
+
+function text(tag, className, value) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  el.textContent = value || '';
+  return el;
+}
+
+function image(src) {
+  if (!src) return text('div', 'thumb ph', '');
+  const img = document.createElement('img');
+  img.className = 'thumb';
+  img.src = src;
+  img.loading = 'lazy';
+  img.alt = '';
+  img.onerror = () => img.replaceWith(text('div', 'thumb ph', ''));
+  return img;
+}
+
+function renderError(message) {
+  app.innerHTML = '';
+  const hero = text('div', 'hero', '');
+  hero.append(text('h1', '', 'Collection unavailable'));
+  hero.append(text('div', 'since', message || 'This link is not available.'));
+  app.append(hero);
+}
+
+function render(data) {
+  const p = data.payload;
+  document.title = `${p.display_name || 'Collector'}'s Collection - SSAI Scanning`;
+  app.innerHTML = '';
+
+  const hero = text('div', 'hero', '');
+  const avatar = text('div', 'avatar', (p.display_name || '?').slice(0, 1).toUpperCase());
+  hero.append(avatar, text('h1', '', p.display_name || 'Collector'));
+  const since = date(p.member_since, { year: 'numeric', month: 'long' });
+  if (since) hero.append(text('div', 'since', `With SSAI since ${since}`));
+  const stats = text('div', 'stats', '');
+  const statCards = text('div', 'stat', '');
+  statCards.append(text('b', '', int(p.total_cards)), text('span', '', 'Cards'));
+  const statValue = text('div', 'stat', '');
+  statValue.append(text('b', '', '$' + int(Math.round(p.total_value || 0))), text('span', '', 'Value'));
+  stats.append(statCards, statValue);
+  hero.append(stats);
+
+  const list = text('div', 'list', '');
+  for (const c of p.cards || []) {
+    const row = text('div', 'row', '');
+    row.append(image(c.image));
+    const info = text('div', 'info', '');
+    const name = text('div', 'cardname', c.name || '');
+    if ((c.quantity || 1) > 1) name.append(text('span', 'qty', ` x${c.quantity}`));
+    const meta = text('div', 'meta', c.set_name ? `${c.set_name}${c.card_number ? ` - #${c.card_number}` : ''}` : '');
+    info.append(name, meta);
+    row.append(info);
+    if (c.value != null) row.append(text('div', 'value', money(c.value)));
+    list.append(row);
+  }
+
+  const footDate = date(data.updated_at, { year: 'numeric', month: 'short', day: 'numeric' });
+  const foot = text('div', 'foot', '');
+  foot.innerHTML = `Shared with <b>SSAI Scanning</b>${footDate ? ` - updated ${footDate}` : ''}`;
+  app.append(hero, list, foot);
+}
+
+if (!/^[A-Za-z0-9]{6,24}$/.test(code)) {
+  renderError('That link looks malformed.');
+} else {
+  fetch(`${API_BASE}/collection-page/${encodeURIComponent(code)}?format=json`)
+    .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'This link is not available.');
+      render(data);
+    })
+    .catch((err) => renderError(err.message));
+}
+</script></body></html>
