@@ -241,6 +241,7 @@ ad targeting.</p>
 information needed to complete your request:</p>
 <ul>
   <li><strong>Collection sharing:</strong> a shared collection can include your display name, selected card records, and public catalog artwork. Locally captured card photos are not included in public collection shares.</li>
+  <li><strong>Marketplace file imports:</strong> when you import a marketplace export file (for example a TCGplayer inventory or pricing file), the listings are used to set up your inventory in the app. We also keep a de-identified record of each row's product, condition, quantity, market price, and listed price to build aggregate price statistics. That record does not contain your name, email address, or account identifier; it carries only a one-way scrambled reference so one contributor is not counted as many.</li>
   <li><strong>Exports:</strong> files you create are sent only to the destination you select through the device sharing interface.</li>
   <li><strong>Marketplace publishing:</strong> if enabled and initiated by you, selected listing information is sent to the marketplace needed to create or publish the listing.</li>
   <li><strong>Optional marketplace sales-email sync:</strong> if you enable this feature, you can forward marketplace seller notifications to a private account-specific address. Our email-processing provider receives the forwarded message so our server can extract order number, item, condition, quantity, price, and order-status facts. We do not intentionally retain the raw message body, buyer name, buyer email, or shipping address in our database. The email provider may temporarily retain the received message under its own retention and security practices. Normalized order and sale records remain linked to your account until you delete them or your account. Separately, we keep a de-identified record of each sale line (card name, condition, quantity, order total, and date) to build aggregate price statistics. That record does not contain your name, email address, account identifier, the order number, or any buyer or shipping detail; it carries only one-way scrambled references so the same sale is not counted twice and so statistics are not based on a single seller.</li>
@@ -254,7 +255,7 @@ subject to that recipient's privacy practices.</p>
   <li>operate the scanner, collection, backup, sharing, pricing, export, and optional sales-sync features you request;</li>
   <li>authenticate accounts and synchronize data;</li>
   <li>improve card matching and maintain the shared recognition pool;</li>
-  <li>build aggregate, de-identified price statistics from marketplace sales;</li>
+  <li>build aggregate, de-identified price statistics from marketplace sales and imported marketplace files;</li>
   <li>measure and enforce service quotas;</li>
   <li>secure the service, prevent fraud and abuse, and troubleshoot failures;</li>
   <li>display and measure non-personalized ads in the free iOS app; and</li>
@@ -285,7 +286,7 @@ for advertising or cross-app tracking.</p>
   <li><strong>Account and cloud-backup data</strong> remains while your account is active or until you delete the applicable records.</li>
   <li><strong>Sales-email sync data</strong> includes the private alias, delivery metadata, and normalized marketplace order facts. We do not intentionally store raw email bodies or buyer contact and shipping details in our database. The inbound-email provider may temporarily retain received messages according to its service practices.</li>
   <li><strong>Operational and security records</strong> are retained only as long as reasonably necessary to provide the service, investigate incidents, enforce restrictions, resolve disputes, or meet legal obligations. Active security bans may be retained while needed to prevent repeated abuse.</li>
-  <li><strong>De-identified sale records</strong> used for aggregate price statistics may remain after you turn off sales-email sync or delete your account, because they are not linked to your identity.</li>
+  <li><strong>De-identified sale and price records</strong> used for aggregate price statistics may remain after you turn off sales-email sync or delete your account, because they are not linked to your identity.</li>
   <li><strong>Aggregated crowd-recognition data</strong> may remain after account deletion because it is combined with other contributions and does not expose your name, email, phone number, collection, or photos. Limited internal deduplication records may also be retained to protect the integrity of the aggregate and prevent duplicate voting.</li>
 </ul>
 <p>You can permanently delete your account from <em>Profile → Account → Delete
